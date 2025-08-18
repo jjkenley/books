@@ -227,7 +227,7 @@
             }
 
             // Define CSV headers
-            const headers = ['Title', 'Authors', 'ISBN', 'Publisher', 'PublishedDate', 'PageCount', 'Categories'];
+            const headers = ['Title', 'Authors', 'ISBN', 'ISBN Link', 'Publisher', 'PublishedDate', 'PageCount', 'Categories'];
             let csvContent = headers.join(',') + '\r\n';
 
             // Function to safely format a field for CSV
@@ -248,6 +248,7 @@
                     book.title,
                     book.authors.join('; '), // Use semicolon in case author names have commas
                     book.isbn,
+					"https://isbnsearch.org/isbn/" + book.isbn,
                     book.publisher,
                     book.publishedDate,
                     book.pageCount,
