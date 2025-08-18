@@ -44,6 +44,18 @@
             padding: 2rem;
             box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
         }
+		body {
+	    	display: flex; /* Enables Flexbox */
+	    	flex-direction: column; /* Stacks children vertically */
+		}
+		main {
+	    	flex-grow: 1; /* Allows the main content to grow and push the footer down */
+		}
+		footer {
+	    	text-align: center;
+	    	padding: 20px;
+	    	background-color: #f2f2f2;
+		}	
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
@@ -330,7 +342,8 @@
             }
         }
     </script>
-
-	<p>Copyright &copy; 2025 Jay Kenley. All rights reserved. The content on this website is the property of the owner and may not be reproduced without permission.</p>
+	<footer>
+		<p>Copyright &copy; 2025 Jay Kenley. All rights reserved. The content on this website is the property of the owner and may not be reproduced without permission.</p>
+	</footer>
 </body>
 </html>
