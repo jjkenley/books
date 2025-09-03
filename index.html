@@ -187,6 +187,30 @@
         function showBookInfo(book) {
             document.getElementById('book-title').textContent = book.title;
             document.getElementById('book-author').textContent = book.authors.join(', ');
+			
+			// Assume 'book' is the object returned from the Google Books API.
+			// Check if the authors array exists and is not empty.
+			if (book.authors && book.authors.length > 0) {
+			  // Use the map() method to reformat each author's name.
+			  const formattedAuthors = book.authors.map(author => {
+				// Split the author string by the space.
+				const nameParts = author.split(' ');
+				
+				// The last part is the last name. The rest are first names.
+				const lastName = nameParts.pop();
+				const firstName = nameParts.join(' ');
+				
+				// Return the reordered name.
+				return `${lastName}, ${firstName}`;
+			  });
+
+			  // Join the formatted names with a comma and space for display.
+			  document.getElementById('book-author').textContent = formattedAuthors.join('; ');
+			} else {
+			  // Handle cases where no author information is available.
+			  document.getElementById('book-author').textContent = 'Author not found';
+			}
+			
             document.getElementById('book-isbn').textContent = `ISBN: ${book.isbn}`;
             // Store the full book object for later use
             bookInfoDiv.dataset.book = JSON.stringify(book);
@@ -239,7 +263,7 @@
             }
 
             // Define CSV headers
-            const headers = ['Title', 'Authors', 'ISBN', 'ISBN Link', 'Publisher', 'PublishedDate', 'PageCount', 'Categories'];
+            const headers = ['Title', 'Authors', 'Authors Formatted', 'ISBN', 'ISBN Link', 'Publisher', 'PublishedDate', 'PageCount', 'Categories'];
             let csvContent = headers.join(',') + '\r\n';
 
             // Function to safely format a field for CSV
@@ -255,19 +279,61 @@
             };
 
             // Add rows
-            bookInventory.forEach(book => {
-                const row = [
-                    book.title,
-                    book.authors.join('; '), // Use semicolon in case author names have commas
-                    book.isbn,
+			
+			//Previous book export code, commented out on 9/3/25 to allow for a reformatted author list.
+            //bookInventory.forEach(book => {
+            //   const row = [
+            //        book.title,
+            //        book.authors.join('; '), // Use semicolon in case author names have commas
+            //        book.isbn,
+			//		"https://isbnsearch.org/isbn/" + book.isbn,
+            //        book.publisher,
+            //        book.publishedDate,
+            //        book.pageCount,
+            //        book.categories ? book.categories.join('; ') : ''
+            //    ].map(formatCsvField).join(',');
+            //    csvContent += row + '\r\n';
+            //});
+
+			//New book export code, added on 9/3/25 to allow for a reformatted author list.
+			bookInventory.forEach(book => {
+				// 1. Check if authors exist and reformat them
+				let reformattedAuthors = '';
+				if (book.authors && book.authors.length > 0) {
+					// Use map() to create a new array with the reformatted names.
+					const reformattedArray = book.authors.map(author => {
+						// Split the name string by a space.
+						const nameParts = author.split(' ');
+						
+						// Pop the last element to get the last name.
+						const lastName = nameParts.pop();
+						
+						// Join the remaining elements back together for the first name.
+						const firstName = nameParts.join(' ');
+						
+						// Return the new "Last, First" format.
+						return `${lastName}, ${firstName}`;
+					});
+					
+					// Join the reformatted names for the CSV field.
+					reformattedAuthors = reformattedArray.join('; ');
+				}
+
+				const row = [
+					book.title,
+					book.authors ? book.authors.join('; ') : '', // Keep the original authors column
+					reformattedAuthors, // Add the new reformatted authors column
+					book.isbn,
 					"https://isbnsearch.org/isbn/" + book.isbn,
-                    book.publisher,
-                    book.publishedDate,
-                    book.pageCount,
-                    book.categories ? book.categories.join('; ') : ''
-                ].map(formatCsvField).join(',');
-                csvContent += row + '\r\n';
-            });
+					book.publisher,
+					book.publishedDate,
+					book.pageCount,
+					book.categories ? book.categories.join('; ') : ''
+				].map(formatCsvField).join(',');
+
+				csvContent += row + '\r\n';
+			});
+
 
             // Create and download the file
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
