@@ -263,7 +263,7 @@
             }
 
             // Define CSV headers
-            const headers = ['Title', 'Authors', 'Authors Formatted', 'ISBN', 'ISBN Link', 'Publisher', 'PublishedDate', 'PageCount', 'Categories'];
+            const headers = ['Title', 'Author Last Name', 'Author First Name','Authors', 'ISBN', 'ISBN Link', 'Publisher', 'PublishedDate', 'PageCount', 'Categories'];
             let csvContent = headers.join(',') + '\r\n';
 
             // Function to safely format a field for CSV
@@ -295,34 +295,49 @@
             //    csvContent += row + '\r\n';
             //});
 
-			//New book export code, added on 9/3/25 to allow for a reformatted author list.
-			bookInventory.forEach(book => {
+			//Previous book export code, commented out on 9/4/25 to allow for a reformatted author list.
+			//bookInventory.forEach(book => {
 				// 1. Check if authors exist and reformat them
-				let reformattedAuthors = '';
-				if (book.authors && book.authors.length > 0) {
+			//	let reformattedAuthors = '';
+			//	if (book.authors && book.authors.length > 0) {
 					// Use map() to create a new array with the reformatted names.
-					const reformattedArray = book.authors.map(author => {
+			//		const reformattedArray = book.authors.map(author => {
 						// Split the name string by a space.
-						const nameParts = author.split(' ');
+			//			const nameParts = author.split(' ');
 						
 						// Pop the last element to get the last name.
-						const lastName = nameParts.pop();
+			//			const lastName = nameParts.pop();
 						
 						// Join the remaining elements back together for the first name.
-						const firstName = nameParts.join(' ');
+			//			const firstName = nameParts.join(' ');
 						
 						// Return the new "Last, First" format.
-						return `${lastName}, ${firstName}`;
-					});
+			//			return `${lastName}, ${firstName}`;
+			//		});
 					
 					// Join the reformatted names for the CSV field.
-					reformattedAuthors = reformattedArray.join('; ');
-				}
+			//		reformattedAuthors = reformattedArray.join('; ');
+			//	}
+			
+			//New book export code, added on 9/4/25 to parse Author first and last name into different columns (only the first author is parsed).
+			bookInventory.forEach(book => {
+				let firstName = '';
+				let lastName = '';
+				let author = book.authors && book.authors[0]; // Get the first author from the array
+
+			// Check if the first author exists before processing.
+			if (author) {
+				const nameParts = author.split(' ');
+				lastName = nameParts.pop(); // Remove and get the last part
+				firstName = nameParts.join(' '); // Join the remaining parts
+			}
 
 				const row = [
 					book.title,
+					lastName,
+					firstName,
 					book.authors ? book.authors.join('; ') : '', // Keep the original authors column
-					reformattedAuthors, // Add the new reformatted authors column
+					//reformattedAuthors, // Add the new reformatted authors column
 					book.isbn,
 					"https://isbnsearch.org/isbn/" + book.isbn,
 					book.publisher,
